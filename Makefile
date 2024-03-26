@@ -1,6 +1,6 @@
 obj-m += i2c-sgp30.o
-
-KDIR = /home/alex/rpi-kernel/linux
+PWD = $(shell pwd)
+KDIR = /home/alex/rpi-kernel-6.8/linux
 
 all: module dt
 	echo Built Device Tree Overlay and kernel module

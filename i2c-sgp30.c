@@ -60,7 +60,7 @@ static int I2C_Read(unsigned char *out_buf, unsigned int len)
 }
 
 
-static void SGP30_Write(unsigned char command, unsigned char data)
+static int SGP30_Write(unsigned char command, unsigned char data)
 {
     unsigned char buf[2] = {0};
     int ret;
@@ -68,7 +68,7 @@ static void SGP30_Write(unsigned char command, unsigned char data)
     buf[0] = command; 
     buf[1] = data;
     
-    ret = I2C_Write(buf, 2);
+    return  I2C_Write(buf, 2);
 }
 
 static int SGP30_Init(void)
@@ -90,8 +90,9 @@ static struct sgp30_measurement SGP30_Measure(void)
 	unsigned char buf[6];
 	struct sgp30_measurement s;
 
-	SGP30_Write(0x20,0x08);
-	I2C_Read(buf, 6);
+	pr_info("wrote %i bytes to sgp30",SGP30_Write(0x20,0x08));
+	mdelay(10);
+	pr_info("read %d bytes from sgp30",I2C_Read(buf, 6));
 	s.co2 = (buf[0]<<8)|buf[1];
        	s.tvoc = (buf[3]<<8)|buf[4];
 	return s;
@@ -116,8 +117,7 @@ static struct proc_ops fops = {
 ** This function getting called when the slave has been found
 ** Note : This will be called only once when we load the driver.
 */
-static int sgp30_probe(struct i2c_client *client,
-                         const struct i2c_device_id *id)
+static int sgp30_probe(struct i2c_client *client)
 {
 
     pr_info("sgp30 init started\n");
